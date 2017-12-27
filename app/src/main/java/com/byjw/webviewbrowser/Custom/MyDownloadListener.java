@@ -8,7 +8,9 @@ import android.net.Uri;
 import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
+import android.webkit.URLUtil;
 import android.widget.Toast;
 
 import static android.content.Context.DOWNLOAD_SERVICE;
@@ -33,27 +35,33 @@ public class MyDownloadListener implements DownloadListener {
             DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
             request.setMimeType(mimeType);
             request.addRequestHeader("User-Agent", userAgent);
+
+            String cookies = CookieManager.getInstance().getCookie(url);
+            request.addRequestHeader("cookie", cookies);
+
             request.setDescription("Downloading file");
-            String fileName = contentDisposition.replace("inline; filename=", "");
-            fileName = fileName.replaceAll("\"", "");
+
+            String fileName = URLUtil.guessFileName(url, contentDisposition, mimeType);
+
             request.setTitle(fileName);
             request.allowScanningByMediaScanner();
             request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
             request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
-            DownloadManager dm = (DownloadManager) context.getSystemService(DOWNLOAD_SERVICE);
-            dm.enqueue(request);
-            Toast.makeText(context, "Downloading File", Toast.LENGTH_LONG).show();
+
+            DownloadManager downloadManager = (DownloadManager) context.getSystemService(DOWNLOAD_SERVICE);
+            assert downloadManager != null;
+            downloadManager.enqueue(request);
         }
         catch (Exception e) {
 
             if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 // Should we show an explanation?
                 if (ActivityCompat.shouldShowRequestPermissionRationale(activity, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    Toast.makeText(context, "첨부파일 다운로드를 위해\n동의가 필요합니다.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, "다운로드를 위해\n동의가 필요합니다.", Toast.LENGTH_LONG).show();
                     ActivityCompat.requestPermissions(activity, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, 110);
                 }
                 else {
-                    Toast.makeText(context, "첨부파일 다운로드를 위해\n동의가 필요합니다.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, "다운로드를 위해\n동의가 필요합니다.", Toast.LENGTH_LONG).show();
                     ActivityCompat.requestPermissions(activity, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, 110);
                 }
             }

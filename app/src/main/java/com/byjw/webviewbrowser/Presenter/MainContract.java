@@ -2,6 +2,10 @@ package com.byjw.webviewbrowser.Presenter;
 
 import android.webkit.WebView;
 
+import com.byjw.webviewbrowser.Model.History;
+
+import io.realm.RealmResults;
+
 /**
  * Created by jungwoon on 2017. 12. 21..
  */
@@ -12,7 +16,7 @@ public interface MainContract {
 
         void addHistory(String url);
 
-        void readHistory();
+        RealmResults<History> readHistory();
     }
 
 
@@ -36,9 +40,9 @@ public interface MainContract {
 
     interface Presenter {
 
-        void init();
+        void attachView(MainContract.View view);
 
-        void attachView(MainContract.View view, WebView webView);
+        void webViewInit(WebView webView);
 
         void detachView();
 
@@ -47,6 +51,8 @@ public interface MainContract {
         void reloadUrl();
 
         void loadUrl(String url);
+
+        void addHistory(String url);
     }
 
 }

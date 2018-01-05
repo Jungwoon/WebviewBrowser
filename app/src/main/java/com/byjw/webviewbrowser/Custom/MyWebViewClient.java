@@ -4,10 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.byjw.webviewbrowser.Presenter.MainContract;
+import com.byjw.webviewbrowser.Presenter.MainPresenter;
 
 /**
  * Created by jungwoon on 2017. 4. 7..
@@ -16,10 +18,12 @@ import com.byjw.webviewbrowser.Presenter.MainContract;
 public class MyWebViewClient extends WebViewClient {
 
     private MainContract.View view;
+    private MainPresenter presenter;
     private Context context;
 
-    public MyWebViewClient(MainContract.View view, Context context) {
+    public MyWebViewClient(MainContract.View view, MainPresenter presenter, Context context) {
         this.view = view;
+        this.presenter = presenter;
         this.context = context;
     }
 
@@ -37,7 +41,9 @@ public class MyWebViewClient extends WebViewClient {
     }
 
     @Override
-    public boolean shouldOverrideUrlLoading(WebView webView, String url) {
+    public boolean shouldOverrideUrlLoading(WebView webView, WebResourceRequest request) {
+        String url = request.getUrl().toString();
+
         if (url.startsWith("tel:")) {
             Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse(url));
             context.startActivity(intent);
@@ -45,12 +51,13 @@ public class MyWebViewClient extends WebViewClient {
             return true;
         }
 
-        // for Progress Bar Loading
         webView.loadUrl(url);
         view.hideProgressLayout();
         view.showToast(webView.getUrl()); // 테스트용 코드
+        presenter.addHistory(url);
 
         return true;
+
     }
 
 }

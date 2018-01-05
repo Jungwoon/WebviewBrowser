@@ -10,6 +10,10 @@ import android.webkit.WebView;
 import com.byjw.webviewbrowser.Custom.MyDownloadListener;
 import com.byjw.webviewbrowser.Custom.MyWebChromeClient;
 import com.byjw.webviewbrowser.Custom.MyWebViewClient;
+import com.byjw.webviewbrowser.Model.History;
+import com.byjw.webviewbrowser.Model.HistoryHandler;
+
+import io.realm.RealmResults;
 
 /**
  * Created by jungwoon on 2017. 12. 21..
@@ -18,6 +22,7 @@ import com.byjw.webviewbrowser.Custom.MyWebViewClient;
 public class MainPresenter implements MainContract.Presenter {
 
     private MainContract.View view;
+    private MainContract.Model model;
     private WebView webView;
     private Context context;
     private Activity activity;
@@ -27,63 +32,18 @@ public class MainPresenter implements MainContract.Presenter {
         this.activity = activity;
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
     @Override
-    public void init() {
+    public void attachView(MainContract.View view) {
+        this.view = view;
         view.setGoPageListener();
-
-        MyWebViewClient myWebViewClient = new MyWebViewClient(view, context);
-        MyWebChromeClient myWebChromeClient = new MyWebChromeClient(view, activity);
-        MyDownloadListener myDownloadListener = new MyDownloadListener(context, activity);
-
-        // WebView에 WebViewClient 세팅
-        webView.setWebViewClient(myWebViewClient);
-        webView.setWebChromeClient(myWebChromeClient);
-        webView.setDownloadListener(myDownloadListener);
-
-        // WebView ProgressBar Settings
-        webView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
-        webView.setScrollbarFadingEnabled(true);
-        webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-
-        WebSettings webViewSettings = webView.getSettings();
-
-        // Support Java Script
-        webViewSettings.setJavaScriptEnabled(true);
-
-        // 팝업창을 띄우기 위함
-        webViewSettings.setJavaScriptCanOpenWindowsAutomatically(true);
-
-        webViewSettings.setLoadsImagesAutomatically(true);
-        webViewSettings.setUseWideViewPort(true);
-
-        webViewSettings.setBuiltInZoomControls(false);
-        webViewSettings.setSupportZoom(true);
-        webViewSettings.setLoadWithOverviewMode(true);
-        webViewSettings.setGeolocationEnabled(true);
-
-        // meta-encoding 이 없는 페이지는 UTF-8로 표시
-        webViewSettings.setDefaultTextEncodingName("UTF-8");
-
-        // Support Flash
-        webViewSettings.setSupportMultipleWindows(true);
-
-        // HTML5 DOM
-        webViewSettings.setDomStorageEnabled(true);
-        webViewSettings.setAllowFileAccess(true);
-
-        // HTML5 App Cache
-        webViewSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
-
-        webViewSettings.setAppCacheEnabled(true);
-        webViewSettings.setAppCachePath(context.getCacheDir().getAbsolutePath());
-
     }
 
     @Override
-    public void attachView(MainContract.View view, WebView webView) {
-        this.view = view;
+    public void webViewInit(WebView webView) {
         this.webView = webView;
+        adoptCustomClient(webView);
+        setProgressBar(webView);
+        setWebViewSettings(webView);
     }
 
     @Override
@@ -102,6 +62,13 @@ public class MainPresenter implements MainContract.Presenter {
     }
 
     @Override
+    public void addHistory(String url) {
+        if (model == null) getModelInstance();
+
+        model.addHistory(url);
+    }
+
+    @Override
     public void reloadUrl() {
         webView.reload();
         view.setUrl(webView.getUrl());
@@ -111,5 +78,47 @@ public class MainPresenter implements MainContract.Presenter {
     public void loadUrl(String url) {
         webView.loadUrl(url);
         view.setUrl(webView.getUrl());
+    }
+
+    private void adoptCustomClient(WebView webView) {
+        webView.setWebViewClient(new MyWebViewClient(view, this, context));
+        webView.setWebChromeClient(new MyWebChromeClient(view, activity));
+        webView.setDownloadListener(new MyDownloadListener(context, activity));
+    }
+
+    @SuppressLint("SetJavaScriptEnabled")
+    private void setWebViewSettings(WebView webView) {
+        WebSettings webViewSettings = webView.getSettings();
+        webViewSettings.setJavaScriptEnabled(true);
+        webViewSettings.setJavaScriptCanOpenWindowsAutomatically(true);
+        webViewSettings.setLoadsImagesAutomatically(true);
+        webViewSettings.setUseWideViewPort(true);
+        webViewSettings.setBuiltInZoomControls(false);
+        webViewSettings.setSupportZoom(true);
+        webViewSettings.setLoadWithOverviewMode(true);
+        webViewSettings.setGeolocationEnabled(true);
+        webViewSettings.setDefaultTextEncodingName("UTF-8");
+        webViewSettings.setSupportMultipleWindows(true);
+        webViewSettings.setDomStorageEnabled(true);
+        webViewSettings.setAllowFileAccess(true);
+        webViewSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
+        webViewSettings.setAppCacheEnabled(true);
+        webViewSettings.setAppCachePath(context.getCacheDir().getAbsolutePath());
+    }
+
+    private void setProgressBar(WebView webView) {
+        webView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
+        webView.setScrollbarFadingEnabled(true);
+        webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+    }
+
+    private void getModelInstance() {
+        this.model = new HistoryHandler();
+    }
+
+    public RealmResults<History> readHistory() {
+        if (model == null) getModelInstance();
+
+        return model.readHistory();
     }
 }

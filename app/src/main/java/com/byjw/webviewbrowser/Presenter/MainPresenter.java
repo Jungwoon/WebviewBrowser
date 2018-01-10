@@ -26,6 +26,7 @@ public class MainPresenter implements MainContract.Presenter {
     private WebView webView;
     private Context context;
     private Activity activity;
+    private String HOME_ADDRESS = "http://naver.com";
 
     public MainPresenter(Context context, Activity activity) {
         this.context = context;
@@ -53,10 +54,14 @@ public class MainPresenter implements MainContract.Presenter {
 
     @Override
     public String getValidUrl(String url) {
-        if (url == null) return "";
+        if (url == null) return HOME_ADDRESS;
 
-        if (!url.contains("http://") || !url.contains("https://"))
+        if (!url.contains(".")) {
+            url = "https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=0&ie=utf8&query=" + url;
+        }
+        else if (!url.contains("http://") && !url.contains("https://")) {
             url = "http://" + url;
+        }
 
         return url;
     }
@@ -69,6 +74,11 @@ public class MainPresenter implements MainContract.Presenter {
     }
 
     @Override
+    public void loadHome() {
+        loadUrl(HOME_ADDRESS);
+    }
+
+    @Override
     public void reloadUrl() {
         webView.reload();
         view.setUrl(webView.getUrl());
@@ -76,7 +86,7 @@ public class MainPresenter implements MainContract.Presenter {
 
     @Override
     public void loadUrl(String url) {
-        webView.loadUrl(url);
+        webView.loadUrl(getValidUrl(url));
         view.setUrl(webView.getUrl());
     }
 

@@ -3,7 +3,6 @@ package com.byjw.webviewbrowser.View;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -15,7 +14,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.byjw.webviewbrowser.Model.History;
 import com.byjw.webviewbrowser.Presenter.MainContract;
 import com.byjw.webviewbrowser.Presenter.MainPresenter;
 import com.byjw.webviewbrowser.R;
@@ -24,7 +22,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.realm.Realm;
-import io.realm.RealmResults;
 
 public class MainActivity extends AppCompatActivity implements MainContract.View {
 
@@ -44,19 +41,9 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     @OnClick(R.id.btn_reload)
     void reload() {
         mainPresenter.reloadUrl();
-
-        RealmResults<History> a = mainPresenter.readHistory();
-
-        for (int i = 0; i < a.size(); i++) {
-            Log.e(TAG, a.get(i).getDate());
-            Log.e(TAG, a.get(i).getUrl());
-            Log.e(TAG, "-----------");
-        }
-
     }
 
     private MainPresenter mainPresenter;
-    private String HOME_ADDRESS = "http://naver.com";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         mainPresenter = new MainPresenter(this, this);
         mainPresenter.attachView(this);
         mainPresenter.webViewInit(webView);
-        mainPresenter.loadUrl(HOME_ADDRESS);
+        mainPresenter.loadHome();
     }
 
     @Override

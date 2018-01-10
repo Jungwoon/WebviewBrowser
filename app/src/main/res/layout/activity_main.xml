@@ -25,6 +25,7 @@
             android:background="@drawable/edit_text_boundary"
             android:textColor="#757575"
             android:textSize="15sp"
+            android:selectAllOnFocus="true"
             android:imeOptions="actionGo"
             android:inputType="textWebEditText"
             android:hint="검색어 또는 URL 입력"/>

@@ -53,6 +53,8 @@ public interface MainContract {
         void loadUrl(String url);
 
         void addHistory(String url);
+
+        void loadHome();
     }
 
 }

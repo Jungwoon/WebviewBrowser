@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="#f2f2f2"
     tools:context="com.byjw.webviewbrowser.View.MainActivity">
 
     <LinearLayout
@@ -13,50 +14,58 @@
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:padding="10dp"
-        android:background="?android:attr/windowBackground"
-        android:orientation="horizontal">
+        android:background="#f2f2f2"
+        android:orientation="vertical">
 
-        <com.byjw.webviewbrowser.Util.ClearEditText
-            android:id="@+id/edit_url"
-            android:layout_weight="5"
-            android:layout_width="300dp"
-            android:padding="5dp"
-            android:layout_height="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:background="@drawable/edit_text_boundary"
-            android:textColor="#757575"
-            android:textSize="15sp"
-            android:selectAllOnFocus="true"
-            android:imeOptions="actionGo"
-            android:inputType="textWebEditText"
-            android:hint="검색어 또는 URL 입력"/>
+            android:orientation="horizontal">
 
-        <ImageButton
-            android:id="@+id/btn_reload"
-            android:layout_gravity="center"
-            android:layout_marginStart="5dp"
-            android:layout_marginEnd="5dp"
-            android:layout_weight="1"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:background="?android:attr/windowBackground"
-            android:src="@drawable/ic_refresh_24dp"/>
+            <com.byjw.webviewbrowser.Util.ClearEditText
+                android:id="@+id/edit_url"
+                android:layout_weight="5"
+                android:layout_width="300dp"
+                android:padding="7dp"
+                android:layout_height="wrap_content"
+                android:textColor="#757575"
+                android:textSize="15sp"
+                android:background="@null"
+                android:selectAllOnFocus="true"
+                android:imeOptions="actionGo"
+                android:inputType="textWebEditText"
+                android:hint="검색어 또는 URL 입력"
+                tools:ignore="TextFields" />
+
+            <ImageView
+                android:id="@+id/btn_reload"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_weight="1"
+                android:src="@drawable/ic_refresh_24dp" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
     <FrameLayout
         android:id="@+id/progress_layout"
         android:layout_width="match_parent"
-        android:layout_height="3dp"
-        android:background="@android:color/transparent">
+        android:layout_height="2dp"
+        android:background="#f2f2f2">
 
         <ProgressBar
             android:id="@+id/progress_bar"
             android:layout_width="match_parent"
-            android:layout_height="8dp"
-            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_height="match_parent"
             android:layout_gravity="top"
             android:layout_marginTop="-3dp"
-            android:progressDrawable="@drawable/custom_progress"/>
+            android:progressDrawable="@drawable/custom_progress"
+            style="?android:attr/progressBarStyleHorizontal" />
 
     </FrameLayout>
 

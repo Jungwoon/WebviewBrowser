@@ -10,6 +10,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,9 +39,13 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     @BindView(R.id.progress_layout)
     FrameLayout progressLayout;
+
+    @BindView(R.id.btn_reload)
+    ImageView refreshButton;
+
     @OnClick(R.id.btn_reload)
     void reload() {
-        mainPresenter.reloadUrl();
+        mainPresenter.loadingOrStop();
     }
 
     private MainPresenter mainPresenter;
@@ -68,10 +73,8 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         // Back 키를 눌렀을때 종료가 되는게 아니라, 이전 페이지로 넘어 가는 부분
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (webView.canGoBack()) {
-                webView.goBack();
+            if (mainPresenter.goBack())
                 return true;
-            }
         }
 
         return super.onKeyDown(keyCode, event);
@@ -95,11 +98,13 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     @Override
     public void showProgressLayout() {
         progressLayout.setVisibility(View.VISIBLE);
+        refreshButton.setImageDrawable(getDrawable(R.drawable.ic_clear_24dp));
     }
 
     @Override
     public void hideProgressLayout() {
-        progressLayout.setVisibility(View.GONE);
+        progressLayout.setVisibility(View.INVISIBLE);
+        refreshButton.setImageDrawable(getDrawable(R.drawable.ic_refresh_24dp));
     }
 
     @Override

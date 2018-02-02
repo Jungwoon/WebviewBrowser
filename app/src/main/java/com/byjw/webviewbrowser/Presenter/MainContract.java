@@ -48,13 +48,19 @@ public interface MainContract {
 
         String getValidUrl(String url);
 
-        void reloadUrl();
+        void loadingOrStop();
 
         void loadUrl(String url);
 
         void addHistory(String url);
 
         void loadHome();
+
+        void toggleButtonFlag();
+
+        boolean goBack();
+
+        String getUrl();
     }
 
 }

@@ -3,6 +3,7 @@ package com.byjw.webviewbrowser.Presenter;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -10,10 +11,7 @@ import android.webkit.WebView;
 import com.byjw.webviewbrowser.Custom.MyDownloadListener;
 import com.byjw.webviewbrowser.Custom.MyWebChromeClient;
 import com.byjw.webviewbrowser.Custom.MyWebViewClient;
-import com.byjw.webviewbrowser.Model.History;
 import com.byjw.webviewbrowser.Model.HistoryHandler;
-
-import io.realm.RealmResults;
 
 /**
  * Created by jungwoon on 2017. 12. 21..
@@ -22,11 +20,12 @@ import io.realm.RealmResults;
 public class MainPresenter implements MainContract.Presenter {
 
     private MainContract.View view;
-    private MainContract.Model model;
     private WebView webView;
     private Context context;
     private Activity activity;
     private String HOME_ADDRESS = "http://naver.com";
+    private boolean buttonFlag = true;
+
 
     public MainPresenter(Context context, Activity activity) {
         this.context = context;
@@ -68,9 +67,7 @@ public class MainPresenter implements MainContract.Presenter {
 
     @Override
     public void addHistory(String url) {
-        if (model == null) getModelInstance();
-
-        model.addHistory(url);
+        // 쌔애
     }
 
     @Override
@@ -79,10 +76,41 @@ public class MainPresenter implements MainContract.Presenter {
     }
 
     @Override
-    public void reloadUrl() {
-        webView.reload();
+    public void toggleButtonFlag() {
+        buttonFlag = !buttonFlag;
+    }
+
+    @Override
+    public boolean goBack() {
+        if (webView.canGoBack()) {
+            webView.goBack();
+            Log.e("TAG", "canGoBack");
+            return true;
+        }
+        else {
+            Log.e("TAG", "can't GoBack");
+        }
+
+        return false;
+
+
+    }
+
+    @Override
+    public String getUrl() {
+        return webView.getUrl();
+    }
+
+    @Override
+    public void loadingOrStop() {
+        if (buttonFlag)
+            webView.reload();
+        else
+            webView.stopLoading();
+
         view.setUrl(webView.getUrl());
     }
+
 
     @Override
     public void loadUrl(String url) {
@@ -92,7 +120,7 @@ public class MainPresenter implements MainContract.Presenter {
 
     private void adoptCustomClient(WebView webView) {
         webView.setWebViewClient(new MyWebViewClient(view, this, context));
-        webView.setWebChromeClient(new MyWebChromeClient(view, activity));
+        webView.setWebChromeClient(new MyWebChromeClient(view));
         webView.setDownloadListener(new MyDownloadListener(context, activity));
     }
 
@@ -122,13 +150,5 @@ public class MainPresenter implements MainContract.Presenter {
         webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
     }
 
-    private void getModelInstance() {
-        this.model = new HistoryHandler();
-    }
 
-    public RealmResults<History> readHistory() {
-        if (model == null) getModelInstance();
-
-        return model.readHistory();
-    }
 }

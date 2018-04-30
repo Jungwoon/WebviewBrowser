@@ -86,7 +86,7 @@ public class MyWebViewClient extends WebViewClient {
 
         webView.loadUrl(url);
         view.hideProgressLayout();
-//        view.showToast(webView.getUrl()); // 테스트용 코드
+//        view.showToast(url); // 테스트용 코드
         presenter.addHistory(url);
 
         return true;
